@@ -12,6 +12,8 @@ momentum_beta = 0.9  # 0 disables momentum
 momentum_bias_corr = True
 rms_prop_beta = 0.99  # 0 disables rms prop
 rms_prop_bias_corr = True
+# regularization
+dropout_keep_prob = 0.8  # 1 disables dropout, only implemented in dense layers
 
 
 # computes a = activation(z), accepts numpy matrices
@@ -225,6 +227,7 @@ class PoolLayer:
                 mask = self.create_mask(a_slice)
                 pooled = np.sum(a_slice * mask, axis=(1, 2))  # pooling step
                 y[:, y_row, y_col] = pooled
+
         return y
 
     # creates a mask that pools a_slice according to pool_type
@@ -321,7 +324,15 @@ class DenseLayer:
         assert x.shape[0] == self.num_inputs  # assumes x is in desired shape
         self.x = x  # stores x for back prop
         self.z = np.dot(self.w, x) + self.b  # store z for back prop
-        return activation(self.z, self.activation_func)
+        a = activation(self.z, self.activation_func)
+
+        # dropout regularization
+        if network.index(self) != len(network) - 1:
+            self.d = np.random.rand(a.shape[0], a.shape[1])
+            self.d = (self.d < dropout_keep_prob).astype(int)
+            a = a * self.d
+            a = a / dropout_keep_prob
+        return a
 
     # inputs dJ/da of the current layer, updates its weights and b, outputs the dJ/da of the previous layer
     def back_propagation(self, da):
@@ -329,6 +340,11 @@ class DenseLayer:
         :param da: dJ/da of the current layer, a matrix of dimension (#neurons, #samples)
         :return: dJ/da of the previous layer, a matrix of dimension (#inputs, #samples)
         """
+        # dropout regularization
+        if network.index(self) != len(network) - 1:
+            da = da * self.d
+            da = da / dropout_keep_prob
+
         m_batch = da.shape[1]  # #samples
         dz = da * activation_prime(self.z, self.activation_func)
         dw = 1 / m_batch * np.dot(dz, self.x.T)
