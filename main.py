@@ -17,7 +17,7 @@ def main():
     read()  # load dataset
     train(start=0, end=40000, batch_size=64, num_epochs=10)  # if batch_size=1, it is stochastic gradient descent
     print("training set accuracy: ")
-    test(start=0, end=400)
+    test(start=0, end=40000)
     print("dev set accuracy: ")
     test(start=40000, end=41000)
     print("test set accuracy: ")
