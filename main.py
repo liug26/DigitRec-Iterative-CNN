@@ -59,7 +59,7 @@ def train(start, end, batch_size, num_epochs):
             batch_end = min(end, start + batch_size * (b + 1))  # start and end index of the current batch
             cnn.learn(x[batch_start: batch_end, :, :], y2[:, batch_start: batch_end])
             progress_bar.update(1)
-        #nio.save()  # autosave every epoch
+        nio.save()  # autosave every epoch
     progress_bar.close()
 
     # display cnn's cost map
