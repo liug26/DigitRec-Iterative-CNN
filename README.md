@@ -1,4 +1,4 @@
-# Digit Recognition w/ CNN from Scratch
+# Digit Recognition w/ CNN from Scratch [Iterative]
 
 ## Summary
 The contained python files provide a framework to implement and train a convolutional neural network that recognizes hand-written digits. The framework is written from scratch (no TensorFlow, only NumPy). I incorporated gradient descent, dropout regularization, adam optimization into the framework. Please note that vectorization is only implemented on the dense layers, so training is slow. My own implementation achieved a roughly 98% dev set accuracy rate. 
